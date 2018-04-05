@@ -1,0 +1,6 @@
+|                |        | Bob    | Alice     |
+|----------------|--------|--------|-----------|
+| Favorite       | Color  | Blue   | Purple    |
+|                | Flavor | Banana | Chocolate |
+| Least Favorite | Color  | Yellow | Pink      |
+|                | Flavor | Mint   | Walnut    |

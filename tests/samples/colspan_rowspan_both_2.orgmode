@@ -1,0 +1,7 @@
+| colspan2, rowspan2 |            | row1, col3         | row1, col4 |
+|--------------------+------------+--------------------+------------|
+|                    |            | row2, col3         | row2, col4 |
+| row3, col1         | row3, col2 | colspan2, rowspan2 |            |
+| row4               |            |                    |            |
+| colspan2, rowspan2 |            | row5, col3         | row5, col4 |
+|                    |            | row6, col3         | row6, col4 |

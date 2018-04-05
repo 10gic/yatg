@@ -1,0 +1,4 @@
+| 1st row | colspan2       |                | rowspan2 |
+|---------|----------------|----------------|----------|
+| 2nd row | under colspan2 | under colspan2 |          |
+| 3rd row | colspan3       |                |          |
