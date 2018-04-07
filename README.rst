@@ -54,7 +54,7 @@ To install YATG from PyPI::
 
   $ pip install yatg
 
-Or just::
+Or from github::
 
   $ curl -O https://raw.githubusercontent.com/10gic/yatg/master/yatg/yatg.py && chmod u+x yatg.py
 
@@ -64,7 +64,8 @@ Usage
 Options::
 
   usage: yatg [-h] [-i INFILE] [-f FORMAT] [-d DELIMITER] [-o OUTFILE]
-              [-s STYLE]
+              [-s STYLE] [--no-header] [--column-align ALIGN]
+              [--width1-chars CHARS]
 
   Yet Another Table Generator, convert CSV or html table to ASCII art table.
 
@@ -82,18 +83,32 @@ Options::
     -s STYLE, --output-style STYLE
                           specify output table style, support 'orgmode',
                           'emacs', 'mysql', 'markdown', default is orgmode style
+    --no-header           horizontal header line would not be printed if this
+                          option present
+    --column-align ALIGN  specify align string of columns, support 'l/r'. For
+                          example, 'llrr' specify first two colums align left,
+                          3rd and 4th columns align right. Default alignment is
+                          left.
+    --width1-chars CHARS  specify chars that should consider one character width
+                          by force, only 'emoji' is supported currently. emoji
+                          is considered as WIDE in unicode, but most terminal
+                          render it only one character wide, you can set
+                          --width1-chars=emoji to make output aligned in your
+                          terminal
 
 Feature
 =======
 
-1. Support multi output styles: emacs/orgmode(default)/mysql/markdown style.
-2. Colspan and rowspan are supported.
-3. Table is keep aligned when cell contains both ASCII and non-ASCII charaters.
-4. Compatible with Python 2 and Python 3, tested in Python 2.6/2.7/3.6.
-5. No 3rd-part dependency.
+- Support colspan and rowspan.
+- Support multi output styles: emacs/orgmode(default)/mysql/markdown style.
+- Table is keep aligned when cell contains both ASCII and non-ASCII charaters.
+- Support custom column alignment.
+- Header line is optional.
+- Compatible with Python 2 and Python 3, tested in Python 2.6/2.7/3.6.
+- No 3rd-part dependency (option ``--width1-chars=emoji`` require package emoji).
 
 Limitation
 ==========
 
-1. Multi-line text in one table cell would flatten to one line.
-2. Nested tables are not supported.
+- Multi-line text in one table cell would flatten to one line.
+- Nested tables are not supported.

@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+""" Yet Another Table Generator, convert CSV or html table to ASCII art table. """
 
-# author="cig01"
-# version="1.0.0"
-# description="Yet Another Table Generator, convert CSV or html table to ASCII art table."
-# license="AGPLv3+"
-# url="https://github.com/10gic/yatg"
+__author__ = 'cig01'
+__email__ = 'juhani@163.com'
+__version__ = '0.10.0'
+__source__ = 'https://github.com/10gic/yatg'
+__license__ = 'AGPLv3+'
+
+__all__ = ['html_2_ascii_table', 'csv_2_ascii_table', 'FORCE_WIDTH1_CHARS']
+
 import sys
 import unicodedata
 import logging
@@ -27,10 +31,23 @@ MAX_TABLE_ROWS = 500
 # Maximum number of columns that supported, you can enlarge it for big table
 MAX_TABLE_COLS = 100
 
+FORCE_WIDTH1_CHARS = []
+
 
 def _wide_chars(s):
     """ Return the number of wide chars in string s. WIDE(W) and FULLWIDTH(F) is
     considered as wide chars. AMBIGUOUS(A), for example “”‘’, is not wide."""
+    if 'emoji' in FORCE_WIDTH1_CHARS:
+        try:
+            import emoji
+            # emoji don't consider as wide char if it in FORCE_WIDTH1_CHARS
+            return sum(x not in emoji.UNICODE_EMOJI and \
+                       (unicodedata.east_asian_width(x) == 'W' or \
+                        unicodedata.east_asian_width(x) == 'F')
+                for x in s)
+        except ImportError:
+            # error message already printed in entry function
+            pass
     return sum(
         unicodedata.east_asian_width(x) == 'W'
         or unicodedata.east_asian_width(x) == 'F' for x in s)
@@ -437,9 +454,15 @@ def gen_output_cols_width(expand_table, output_style):
     return cols_max_width
 
 
-def output_emacs_table(table, cols_max_width):
+def output_emacs_table(table, cols_max_width, column_align):
     if not table:
         return ""
+    alignment = ['l' for _ in range(MAX_TABLE_COLS)]  # default is left align
+    if column_align:
+        if len(column_align) > MAX_TABLE_COLS:
+            column_align = column_align[0:MAX_TABLE_COLS]
+        for index, item in enumerate(column_align):
+            alignment[index] = item
     out_str = ''
     for i in range(len(table)):
         # output horizontal line
@@ -498,7 +521,14 @@ def output_emacs_table(table, cols_max_width):
             if not is_span_cell(table[i][j]):
                 data_width = _width(table[i][j].data)
                 diff = cols_max_width[j] - data_width
-                content = " " + table[i][j].data + " " * diff + " "
+                if alignment[j] == 'l':
+                    content = " " + table[i][j].data + " " * diff + " "
+                elif alignment[j] == 'r':
+                    content = " " + " " * diff + table[i][j].data + " "
+                else:
+                    raise Exception(
+                        'Found invalid column align char {0}'.format(
+                            alignment[j]))
                 # logger.debug("normal cell[%d][%d] content=[%s]", i, j, content)
                 out_str += content
             elif is_leader_span_cell(table[i][j]):
@@ -510,7 +540,14 @@ def output_emacs_table(table, cols_max_width):
                 # logger.debug("cell_colspan=[%s]", cell_colspan)
                 # logger.debug("cell_width=[%s]", cell_width)
                 # logger.debug("diff=[%s]", diff)
-                content = " " + table[i][j].data + " " * diff + " "
+                if alignment[j] == 'l':
+                    content = " " + table[i][j].data + " " * diff + " "
+                elif alignment[j] == 'r':
+                    content = " " + " " * diff + table[i][j].data + " "
+                else:
+                    raise Exception(
+                        'Found invalid column align char {0}'.format(
+                            alignment[j]))
                 out_str += content
             elif i > 0 and is_same_span_id(table[i - 1][j], table[i][j]):
                 # output empty string for rowspan
@@ -529,7 +566,8 @@ def output_emacs_table(table, cols_max_width):
     return out_str
 
 
-def output_table_no_span(table, cols_max_width, output_style):
+def output_table_no_span(table, cols_max_width, output_style, column_align,
+                         no_header):
     r""" Output table to orgmode or mysql or markdown style.
     An example of orgmode style:
     | Name  | Phone | Age |
@@ -582,6 +620,12 @@ def output_table_no_span(table, cols_max_width, output_style):
         cols_max_width_new = \
             [a + multi * b for a, b in zip(cols_max_width, nums_of_vert_bar)]
 
+    alignment = ['l' for _ in range(MAX_TABLE_COLS)]  # default is left align
+    if column_align:
+        if len(column_align) > MAX_TABLE_COLS:
+            column_align = column_align[0:MAX_TABLE_COLS]
+        for index, item in enumerate(column_align):
+            alignment[index] = item
     out_str = ''
     for i in range(len(table)):
         if i == 0 and output_style == 'mysql':
@@ -593,31 +637,34 @@ def output_table_no_span(table, cols_max_width, output_style):
                     out_str += "+"
                 out_str += "-" * (1 + cols_max_width_new[j] + 1)
             out_str += "+\n"
-        if i == 1:
-            # output horizontal line
-            for j in range(len(table[i])):
-                if j == 0:  # first character in horizontal line
-                    if output_style == 'orgmode':
-                        out_str += "|"
-                    elif output_style == 'mysql':
-                        out_str += "+"
-                    elif output_style == 'markdown':
-                        out_str += "|"
-                else:
-                    if output_style == 'orgmode':
-                        out_str += "+"
-                    elif output_style == 'mysql':
-                        out_str += "+"
-                    elif output_style == 'markdown':
-                        out_str += "|"
-                out_str += "-" * (1 + cols_max_width_new[j] + 1)
-            # last character and newline in horizontal line
-            if output_style == 'orgmode':
-                out_str += "|\n"
-            elif output_style == 'mysql':
-                out_str += "+\n"
-            elif output_style == 'markdown':
-                out_str += "|\n"
+        if no_header:
+            pass
+        else:
+            if i == 1:
+                # output horizontal line
+                for j in range(len(table[i])):
+                    if j == 0:  # first character in horizontal line
+                        if output_style == 'orgmode':
+                            out_str += "|"
+                        elif output_style == 'mysql':
+                            out_str += "+"
+                        elif output_style == 'markdown':
+                            out_str += "|"
+                    else:
+                        if output_style == 'orgmode':
+                            out_str += "+"
+                        elif output_style == 'mysql':
+                            out_str += "+"
+                        elif output_style == 'markdown':
+                            out_str += "|"
+                    out_str += "-" * (1 + cols_max_width_new[j] + 1)
+                # last character and newline in horizontal line
+                if output_style == 'orgmode':
+                    out_str += "|\n"
+                elif output_style == 'mysql':
+                    out_str += "+\n"
+                elif output_style == 'markdown':
+                    out_str += "|\n"
         # output content
         for j in range(len(table[i])):
             out_str += "|"
@@ -631,7 +678,14 @@ def output_table_no_span(table, cols_max_width, output_style):
                     data_new = table[i][j].data.replace("|", escaped)
                 data_width = _width(data_new)
                 diff = cols_max_width_new[j] - data_width
-                content = " " + data_new + " " * diff + " "
+                if alignment[j] == 'l':
+                    content = " " + data_new + " " * diff + " "
+                elif alignment[j] == 'r':
+                    content = " " + " " * diff + data_new + " "
+                else:
+                    raise Exception(
+                        'Found invalid column align char {0}'.format(
+                            alignment[j]))
                 out_str += content
         out_str += "|\n"
         if i == len(table) - 1 and output_style == 'mysql':
@@ -673,7 +727,11 @@ def gen_table_from_csv(csv_content, csv_delimiter):
     return ret_tables
 
 
-def csv_2_ascii_table(csv_content, csv_delimiter=',', output_style='orgmode'):
+def csv_2_ascii_table(csv_content,
+                      csv_delimiter=',',
+                      output_style='orgmode',
+                      column_align=None,
+                      no_header=False):
     """ Convert csv to ascii table.
 
     Arguments:
@@ -696,16 +754,20 @@ def csv_2_ascii_table(csv_content, csv_delimiter=',', output_style='orgmode'):
         logger.debug("cols_max_width=%s", cols_max_width)
         if output_style == 'emacs':
             output_str += output_emacs_table(table_expand_spans,
-                                             cols_max_width)
+                                             cols_max_width, column_align)
         else:
             output_str += output_table_no_span(table_expand_spans,
-                                               cols_max_width, output_style)
+                                               cols_max_width, output_style,
+                                               column_align, no_header)
         output_str += "\n"  # output newline as the delimiter of multiple tables
     # logger.debug("Out put is:\n" + output_str)
     return output_str[:-1] if output_str.endswith("\n") else output_str
 
 
-def html_2_ascii_table(html_content, output_style='orgmode'):
+def html_2_ascii_table(html_content,
+                       output_style='orgmode',
+                       column_align=None,
+                       no_header=False):
     """ Convert html table to ascii table.
 
     Arguments:
@@ -729,10 +791,11 @@ def html_2_ascii_table(html_content, output_style='orgmode'):
         logger.debug("cols_max_width=%s", cols_max_width)
         if output_style == 'emacs':
             output_str += output_emacs_table(table_expand_spans,
-                                             cols_max_width)
+                                             cols_max_width, column_align)
         else:
             output_str += output_table_no_span(table_expand_spans,
-                                               cols_max_width, output_style)
+                                               cols_max_width, output_style,
+                                               column_align, no_header)
         output_str += "\n"  # output newline as the delimiter of multiple tables
     # With Python 3.6, &nbsp; &#160; would convert to NO-BREAK SPACE(0xA0) by
     # HTMLParser. I expect it just convert to SPACE(0x20).
@@ -748,6 +811,9 @@ def main_entry():
     output_file = None
     output_style = 'orgmode'  # default
     csv_delimiter = None
+    no_header = False
+    column_align = None
+    width1_chars = None
     try:
         import argparse  # argparse is introduced in Python 2.7 and Python 3.2
         a_parser = argparse.ArgumentParser(
@@ -790,16 +856,52 @@ def main_entry():
             default="orgmode",
             dest="output_style",
             choices=["emacs", "orgmode", "mysql", "markdown"])
+        a_parser.add_argument(
+            '--no-header',
+            help=
+            "horizontal header line would not be printed if this option present",
+            action='store_true',
+            dest="no_header")
+        a_parser.add_argument(
+            "--column-align",
+            help=
+            "specify align string of columns, support 'l/r'. For example, 'llrr' specify first two colums align left, 3rd and 4th columns align right. Default alignment is left.",
+            metavar='ALIGN',
+            dest="column_align")
+        a_parser.add_argument(
+            "--width1-chars",
+            help=
+            "specify chars that should consider one character width by force, only 'emoji' is supported currently. emoji is considered as WIDE in unicode, but most terminal render it only one character wide, you can set --width1-chars=emoji to make output aligned in your terminal",
+            metavar='CHARS',
+            dest="width1_chars",
+            choices=["emoji"])
         args = a_parser.parse_args()
         input_file = args.input_file
         input_format = args.input_format
         output_file = args.output_file
         output_style = args.output_style
         csv_delimiter = args.csv_delimiter
+        no_header = args.no_header
+        width1_chars = args.width1_chars
+        column_align = args.column_align
     except ImportError:
         sys.stderr.write(
             "Warn: Cannot import argparse. Read from stdin, convert to {0} style always\n".
             format(output_style))
+    if column_align is not None:
+        if column_align.replace("l", "").replace("r", ""):
+            sys.stderr.write(
+                "--column-align is not valid, only l/r is supported.\n")
+            sys.exit(1)
+    if width1_chars == 'emoji':
+        try:
+            import emoji
+        except ImportError:
+            sys.stderr.write(
+                "Error: force emoji be one character width need package emoji, please install it.\n"
+            )
+            sys.exit(1)
+        FORCE_WIDTH1_CHARS.append('emoji')
     if input_file:  # read from file
         input_content = input_file.read()
         input_file.close()
@@ -828,10 +930,11 @@ def main_entry():
                     csv_delimiter))
     out_content = ""
     if input_format == "html":
-        out_content = html_2_ascii_table(input_content, output_style)
+        out_content = html_2_ascii_table(input_content, output_style,
+                                         column_align, no_header)
     elif input_format == "csv":
         out_content = csv_2_ascii_table(input_content, csv_delimiter,
-                                        output_style)
+                                        output_style, column_align, no_header)
     if out_content:
         if output_file is None:
             sys.stdout.write(out_content)

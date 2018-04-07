@@ -4,6 +4,7 @@
 import os
 import sys
 import unittest
+import emoji
 
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.abspath(file_path))
@@ -131,14 +132,13 @@ class TestHtmlTableConverter(unittest.TestCase):
         self.assertEqual(fail_num, 0,
                          "Failed {0} markdown table cases".format(fail_num))
 
-
     def test_csv_to_orgmode(self):
         succ_num = 0
         fail_num = 0
         for file in os.listdir(self.samples_path):
             if file.endswith('.csv'):
-                html_path = os.path.join(self.samples_path, file)
-                fo = open(html_path, "r")
+                csv_path = os.path.join(self.samples_path, file)
+                fo = open(csv_path, "r")
                 data = fo.read()
                 fo.close()
 
@@ -160,6 +160,59 @@ class TestHtmlTableConverter(unittest.TestCase):
                     print(fail_msg)
         self.assertEqual(fail_num, 0,
                          "Failed {0} orgmode table cases".format(fail_num))
+
+    def test_column_align(self):
+        csv_path = os.path.join(self.samples_path, "csv_simple.csv")
+        fo = open(csv_path, "r")
+        data = fo.read()
+        fo.close()
+        result = yatg.csv_2_ascii_table(data, ',', 'orgmode', 'lrr')
+
+        expect_path = os.path.join(self.samples_path,
+                                   "csv_simple.orgmode.column_align")
+        fo = open(expect_path, "r")
+        expect = fo.read()
+        fo.close()
+
+        fail_msg = "Test column_align failed, result is\n{0}, but expect:\n{1}".format(
+            result, expect)
+        self.assertEqual(result.rstrip(), expect.rstrip(), fail_msg)
+
+    def test_no_header(self):
+        csv_path = os.path.join(self.samples_path, "csv_simple.csv")
+        fo = open(csv_path, "r")
+        data = fo.read()
+        fo.close()
+        result = yatg.csv_2_ascii_table(data, ',', 'orgmode', None, True)
+
+        expect_path = os.path.join(self.samples_path,
+                                   "csv_simple.orgmode.no_header")
+        fo = open(expect_path, "r")
+        expect = fo.read()
+        fo.close()
+
+        fail_msg = "Test no_header failed, result is\n{0}, but expect:\n{1}".format(
+            result, expect)
+        self.assertEqual(result.rstrip(), expect.rstrip(), fail_msg)
+
+    def test_width1_chars(self):
+        csv_path = os.path.join(self.samples_path, "emoji.csv")
+        fo = open(csv_path, "r")
+        data = fo.read()
+        fo.close()
+        yatg.FORCE_WIDTH1_CHARS.append('emoji')
+        result = yatg.csv_2_ascii_table(data, ',', 'orgmode', None, True)
+
+        expect_path = os.path.join(self.samples_path,
+                                   "emoji.orgmode.width1_chars_emoji")
+        fo = open(expect_path, "r")
+        expect = fo.read()
+        fo.close()
+
+        fail_msg = "Test width1_chars failed, result is\n{0}, but expect:\n{1}".format(
+            result, expect)
+        self.assertEqual(result.rstrip(), expect.rstrip(), fail_msg)
+
 
 if __name__ == '__main__':
     unittest.main()
