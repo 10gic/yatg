@@ -61,11 +61,13 @@ Or from github::
 Usage
 =====
 
+As command-line tool
+--------------------
 Options::
 
   usage: yatg [-h] [-i INFILE] [-f FORMAT] [-d DELIMITER] [-o OUTFILE]
               [-s STYLE] [--no-header] [--column-align ALIGN]
-              [--width1-chars CHARS]
+              [--width1-chars CHARS] [--align-in-tty]
 
   Yet Another Table Generator, convert CSV or html table to ASCII art table.
 
@@ -90,11 +92,87 @@ Options::
                           3rd and 4th columns align right. Default alignment is
                           left.
     --width1-chars CHARS  specify chars that should consider one character width
-                          by force, only 'emoji' is supported currently. emoji
-                          is considered as WIDE in unicode, but most terminal
-                          render it only one character wide, you can set
-                          --width1-chars=emoji to make output aligned in your
-                          terminal
+                          by force, only 'emoji' is supported currently. This
+                          option requires package emoji.
+    --align-in-tty        set column aligned in tty. This option requires
+                          package blessed. If this option present, option
+                          --width1-chars would be ignored. NOTE: (1) this option
+                          requires you in a tty, (2) each column width must less
+                          than width of tty, please enlarge your tty window if
+                          you have long cell data.
+
+As a library
+------------
+Example::
+
+  >>> import yatg
+  >>> print(yatg.csv_2_ascii_table([["head1", "head2"],
+  ... ["content1", "content2"],
+  ... ["content3", "content4"]]))
+  | head1    | head2    |
+  |----------+----------|
+  | content1 | content2 |
+  | content3 | content4 |
+
+  >>> print(yatg.html_2_ascii_table("""
+  ... <table border="1">
+  ...     <tr>
+  ...         <td>1st row</td>
+  ...         <td colspan=2>colspan2</td>
+  ...         <td rowspan=2>rowspan2</td>
+  ...     </tr>
+  ...     <tr>
+  ...         <td>2nd row</td>
+  ...         <td>under colspan2</td>
+  ...         <td>under colspan2</td>
+  ...     </tr>
+  ...     <tr>
+  ...         <td>3rd row</td>
+  ...         <td colspan=3>colspan3</td>
+  ...     </tr>
+  ... </table>""", output_style='emacs'))
+  +---------+---------------------------------+----------+
+  | 1st row | colspan2                        | rowspan2 |
+  +---------+----------------+----------------+          |
+  | 2nd row | under colspan2 | under colspan2 |          |
+  +---------+----------------+----------------+----------+
+  | 3rd row | colspan3                                   |
+  +---------+--------------------------------------------+
+
+Function doc::
+
+  >>> print(yatg.csv_2_ascii_table.__doc__)
+   Convert csv to ascii table.
+
+      Arguments:
+        csv_content: Data of input csv, can be string or 'list of list'.
+        csv_delimiter: The delimiter of csv string data (default is ',').
+        output_style: The output style: emacs|orgmode|mysql|markdown
+                      (default is 'orgmode').
+        column_align: align string of columns, support 'l/r'. For example,
+                     'llrr' specify first two colums align left, 3rd and 4th
+                     columns align right. Default alignment is left.
+        no_header: whether print horizontal header line. Default is False
+        align_in_tty: force align column in tty
+
+      Returns:
+        Ascii table
+
+  >>> print(yatg.html_2_ascii_table.__doc__)
+   Convert html table to ascii table.
+
+      Arguments:
+        html_content: Data of input html.
+        output_style: The output style: emacs|orgmode|mysql|markdown
+                      (default is 'orgmode').
+        column_align: align string of columns, support 'l/r'. For example,
+                     'llrr' specify first two colums align left, 3rd and 4th
+                     columns align right. Default alignment is left.
+        no_header: whether print horizontal header line. Default is False
+        align_in_tty: force align column in tty
+
+      Returns:
+        Ascii table
 
 Feature
 =======
@@ -105,7 +183,7 @@ Feature
 - Support custom column alignment.
 - Header line is optional.
 - Compatible with Python 2 and Python 3, tested in Python 2.6/2.7/3.6.
-- No 3rd-part dependency (option ``--width1-chars=emoji`` require package emoji).
+- No 3rd-part dependency for major functions.
 
 Limitation
 ==========
