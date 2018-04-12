@@ -4,6 +4,10 @@ YATG
 
 YATG (Yet Another Table Generator) is a utility for generating ASCII art table.
 
+.. image:: https://travis-ci.org/10gic/yatg.svg?branch=master
+    :target: https://travis-ci.org/10gic/yatg
+    :alt: Build status
+
 Introduction
 ============
 
