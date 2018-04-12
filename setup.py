@@ -34,7 +34,10 @@ setup(
     description='A utility for generating ASCII art table',
     long_description=open('README.rst').read(),
     packages=['yatg'],
-    install_requires=['emoji', 'blessed'],
+    extras_require={
+        'forcewidth1': ["emoji"],
+        'alignintty': ["blessed"]
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',

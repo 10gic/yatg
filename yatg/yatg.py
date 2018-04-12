@@ -4,7 +4,7 @@
 
 __author__ = 'cig01'
 __email__ = 'juhani@163.com'
-__version__ = '0.11.1'
+__version__ = '0.11.2'
 __source__ = 'https://github.com/10gic/yatg'
 __license__ = 'AGPLv3+'
 
@@ -954,14 +954,14 @@ def main_entry():
             sys.exit(1)
     if width1_chars == 'emoji':
         if not EMOJI_AVAILABLE:
-            sys.stderr.write("Error: force emoji be one character width " \
-                             "need package emoji, please install it.\n")
+            sys.stderr.write("Error: force emoji be one character width require" \
+                             " package emoji, please run `pip install emoji`.\n")
             sys.exit(1)
         FORCE_WIDTH1_CHARS.append('emoji')
     if align_in_tty:
         if not BLESSED_AVAILABLE:
-            sys.stderr.write("Error: option --align_in_tty require package " \
-                             "blessed, please install it.\n")
+            sys.stderr.write("Error: option --align-in-tty require package " \
+                             "blessed, please run `pip install blessed`\n")
             sys.exit(1)
     if input_file:  # read from file
         input_content = input_file.read()
