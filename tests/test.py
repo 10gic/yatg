@@ -14,7 +14,8 @@ import yatg
 
 class TestHtmlTableConverter(unittest.TestCase):
     def setUp(self):
-        self.samples_path = os.path.join(file_path, 'tests', 'samples')
+        self.samples_path = os.path.join(
+            os.path.join(os.path.dirname(__file__), 'samples'))
 
     def test_html_table_to_emacs(self):
         succ_num = 0
@@ -132,6 +133,10 @@ class TestHtmlTableConverter(unittest.TestCase):
         self.assertEqual(fail_num, 0,
                          "Failed {0} markdown table cases".format(fail_num))
 
+    @unittest.skipIf(sys.version_info[0] == 3 and sys.version_info[1] < 6,
+                     'skip this test for python 3.0 to 3.5')
+    # In python 3.0 to 3.5, unicodedata.east_asian_width('😁') return 'N',
+    # it's wrong, so skip these test cases.
     def test_csv_to_orgmode(self):
         succ_num = 0
         fail_num = 0
