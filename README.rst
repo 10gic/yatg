@@ -186,7 +186,7 @@ Feature
 - Table is keep aligned when cell contains both ASCII and non-ASCII charaters.
 - Support custom column alignment.
 - Header line is optional.
-- Compatible with Python 2 and Python 3, tested in Python 2.6/2.7/3.6.
+- Compatible with Python 2 and Python 3.
 - No 3rd-part dependency for major functions.
 
 Limitation
