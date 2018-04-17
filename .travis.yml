@@ -11,6 +11,12 @@ python:
 # command to install dependencies
 install:
   - pip install emoji
+  - pip install --quiet coveralls
 
 # command to run tests
-script: python tests/test.py
+script:
+  - python tests/test.py
+  - coverage run --source=yatg tests/test.py
+
+after_success:
+  - coveralls
