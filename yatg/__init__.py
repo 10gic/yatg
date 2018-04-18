@@ -10,4 +10,4 @@ from .yatg import html_2_ascii_table, csv_2_ascii_table, FORCE_WIDTH1_CHARS, \
 
 
 def run_main():
-    main_entry()
+    main_entry(sys.argv)

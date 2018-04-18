@@ -852,7 +852,7 @@ def html_2_ascii_table(html_content,
     return output_str[:-1] if output_str.endswith("\n") else output_str
 
 
-def main_entry():
+def main_entry(argv):
     input_file = None
     input_format = None
     output_file = None
@@ -933,7 +933,7 @@ def main_entry():
                  "please enlarge your tty window if you have long cell data.",
             action='store_true',
             dest="align_in_tty")
-        args = arg_parser.parse_args()
+        args = arg_parser.parse_args(argv[1:])
         input_file = args.input_file
         input_format = args.input_format
         output_file = args.output_file
@@ -1010,4 +1010,4 @@ def main_entry():
 
 
 if __name__ == '__main__':
-    main_entry()
+    main_entry(sys.argv)

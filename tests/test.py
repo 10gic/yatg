@@ -3,6 +3,8 @@
 
 import os
 import sys
+import tempfile
+import filecmp
 import unittest
 import emoji
 
@@ -217,6 +219,16 @@ class TestHtmlTableConverter(unittest.TestCase):
         fail_msg = "Test width1_chars failed, result is\n{0}, but expect:\n{1}".format(
             result, expect)
         self.assertEqual(result.rstrip(), expect.rstrip(), fail_msg)
+
+    def test_cmdline(self):
+        _, tmpfn = tempfile.mkstemp()
+        yatg.main_entry([
+            "myprog", "-i",
+            os.path.join(self.samples_path, "csv_simple.csv"), "-f", "csv",
+            "-d", ",", "-o", tmpfn, "-s", "orgmode"
+        ])
+        expfn = os.path.join(self.samples_path, "csv_simple.orgmode")
+        self.assertTrue(filecmp.cmp(tmpfn, expfn))
 
 
 if __name__ == '__main__':
