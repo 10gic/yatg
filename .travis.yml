@@ -15,8 +15,8 @@ install:
 
 # command to run tests
 script:
-  - python tests/test.py
+#  - python tests/test.py
   - coverage run --source=yatg tests/test.py
 
 after_success:
-  - coveralls
+  - coveralls  # Publish coverage results to coveralls.io
