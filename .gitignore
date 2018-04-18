@@ -8,3 +8,4 @@ yatg.egg-info/
 .project
 .pydevproject
 .settings/
+.coverage
