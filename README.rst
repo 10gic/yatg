@@ -196,7 +196,7 @@ Feature
 - Support custom column alignment.
 - Header line is optional.
 - Compatible with Python 2 and Python 3.
-- No 3rd-part dependency for major functions.
+- No 3rd-part dependency for major functionalities.
 
 Limitation
 ==========
