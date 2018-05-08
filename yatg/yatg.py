@@ -3,7 +3,7 @@
 """ Yet Another Table Generator, convert CSV or html table to ASCII art table. """
 
 __author__ = 'cig01'
-__email__ = 'juhani@163.com'
+__email__ = 'juhani AT 163.com'
 __version__ = '0.11.2'
 __source__ = 'https://github.com/10gic/yatg'
 __license__ = 'AGPLv3+'
