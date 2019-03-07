@@ -203,3 +203,4 @@ Limitation
 
 - Multi-line text in one table cell would flatten to one line.
 - Nested tables are not supported.
+- Line wrap in cell is not supported.
