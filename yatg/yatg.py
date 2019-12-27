@@ -4,7 +4,7 @@
 
 __author__ = 'cig01'
 __email__ = 'juhani AT 163.com'
-__version__ = '0.11.2'
+__version__ = '0.11.3'
 __source__ = 'https://github.com/10gic/yatg'
 __license__ = 'AGPLv3+'
 
