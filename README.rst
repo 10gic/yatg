@@ -201,6 +201,7 @@ Feature
 Limitation
 ==========
 
+- Input file must encoded by UTF-8.
 - Multi-line text in one table cell would flatten to one line.
 - Line wrap in cell is not supported.
 - Nested tables are not supported.
