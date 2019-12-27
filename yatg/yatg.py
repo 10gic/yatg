@@ -81,11 +81,17 @@ def wide_chars(s):
         or unicodedata.east_asian_width(x) == 'F' for x in s)
 
 
-def width(s, align_in_tty):
-    """ Return the width of string s."""
-    # python 2, convert str to unicode. In python 3, str is unicode
+def to_unicode(s):
+    """ In python 2, convert s to unicode if s is instance of str. In python 3,
+    str is unicode already, so just return it """
     if sys.version_info[0] < 3 and isinstance(s, str):
         s = s.decode('utf-8')
+    return s
+
+
+def width(s, align_in_tty):
+    """ Return the width of string s."""
+    s = to_unicode(s)
     if align_in_tty and BLESSED_AVAILABLE:
         return width_from_term(s)
     return len(s) + wide_chars(s)
@@ -172,6 +178,7 @@ class MyHTMLParser(HTMLParser):
         """ This is where we save content to a cell """
         if self._in_td or self._in_th:
             # logger.debug("handle_data data=[%s]", data)
+            data = to_unicode(data)
             self._current_cell.append(data)
 
     def handle_entityref(self, name):
@@ -1002,6 +1009,10 @@ def main_entry(argv):
             sys.stdout.write(out_content)
         else:
             outfile = open(output_file, 'w')
+            # Convert content to utf-8 when python 2, avoid following error:
+            # UnicodeDecodeError: 'ascii' codec can't decode byte 0xe8 in position xx
+            if sys.version_info[0] < 3:
+                out_content = out_content.encode('utf-8')
             outfile.write(out_content)
             outfile.close()
     else:
