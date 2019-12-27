@@ -14,6 +14,14 @@ sys.path.insert(0, os.path.abspath(file_path))
 import yatg
 
 
+def to_unicode(s):
+    """ In python 2, convert s to unicode if s is instance of str. In python 3,
+    str is unicode already, so just return it """
+    if sys.version_info[0] < 3 and isinstance(s, str):
+        s = s.decode('utf-8')
+    return s
+
+
 class TestHtmlTableConverter(unittest.TestCase):
     def setUp(self):
         self.samples_path = os.path.join(
@@ -36,7 +44,9 @@ class TestHtmlTableConverter(unittest.TestCase):
                 emacs_fo = open(emacs_path, 'r')
                 expect = emacs_fo.read()
                 emacs_fo.close()
-                fail_msg = "Convert {0} to emacs table failed, result is\n{1}, but expect:\n{2}".format(
+
+                expect = to_unicode(expect)
+                fail_msg = u"Convert {0} to emacs table failed, result is\n{1}, but expect:\n{2}".format(
                     file, result, expect)
                 try:
                     self.assertEqual(result.rstrip(), expect.rstrip(),
@@ -65,7 +75,9 @@ class TestHtmlTableConverter(unittest.TestCase):
                 orgmode_fo = open(orgmode_path, 'r')
                 expect = orgmode_fo.read()
                 orgmode_fo.close()
-                fail_msg = "Convert {0} to orgmode table failed, result is\n{1}, but expect:\n{2}".format(
+
+                expect = to_unicode(expect)
+                fail_msg = u"Convert {0} to orgmode table failed, result is\n{1}, but expect:\n{2}".format(
                     file, result, expect)
                 try:
                     self.assertEqual(result.rstrip(), expect.rstrip(),
@@ -94,7 +106,9 @@ class TestHtmlTableConverter(unittest.TestCase):
                 mysql_fo = open(mysql_path, 'r')
                 expect = mysql_fo.read()
                 mysql_fo.close()
-                fail_msg = "Convert {0} to mysql table failed, result is\n{1}, but expect:\n{2}".format(
+
+                expect = to_unicode(expect)
+                fail_msg = u"Convert {0} to mysql table failed, result is\n{1}, but expect:\n{2}".format(
                     file, result, expect)
                 try:
                     self.assertEqual(result.rstrip(), expect.rstrip(),
@@ -123,7 +137,9 @@ class TestHtmlTableConverter(unittest.TestCase):
                 markdown_fo = open(markdown_path, 'r')
                 expect = markdown_fo.read()
                 markdown_fo.close()
-                fail_msg = "Convert {0} to markdown table failed, result is\n{1}, but expect:\n{2}".format(
+
+                expect = to_unicode(expect)
+                fail_msg = u"Convert {0} to markdown table failed, result is\n{1}, but expect:\n{2}".format(
                     file, result, expect)
                 try:
                     self.assertEqual(result.rstrip(), expect.rstrip(),
@@ -156,7 +172,9 @@ class TestHtmlTableConverter(unittest.TestCase):
                 orgmode_fo = open(orgmode_path, 'r')
                 expect = orgmode_fo.read()
                 orgmode_fo.close()
-                fail_msg = "Convert {0} to orgmode table failed, result is\n{1}, but expect:\n{2}".format(
+
+                expect = to_unicode(expect)
+                fail_msg = u"Convert {0} to orgmode table failed, result is\n{1}, but expect:\n{2}".format(
                     file, result, expect)
                 try:
                     self.assertEqual(result.rstrip(), expect.rstrip(),
@@ -181,7 +199,8 @@ class TestHtmlTableConverter(unittest.TestCase):
         expect = fo.read()
         fo.close()
 
-        fail_msg = "Test column_align failed, result is\n{0}, but expect:\n{1}".format(
+        expect = to_unicode(expect)
+        fail_msg = u"Test column_align failed, result is\n{0}, but expect:\n{1}".format(
             result, expect)
         self.assertEqual(result.rstrip(), expect.rstrip(), fail_msg)
 
@@ -198,7 +217,8 @@ class TestHtmlTableConverter(unittest.TestCase):
         expect = fo.read()
         fo.close()
 
-        fail_msg = "Test no_header failed, result is\n{0}, but expect:\n{1}".format(
+        expect = to_unicode(expect)
+        fail_msg = u"Test no_header failed, result is\n{0}, but expect:\n{1}".format(
             result, expect)
         self.assertEqual(result.rstrip(), expect.rstrip(), fail_msg)
 
@@ -216,7 +236,8 @@ class TestHtmlTableConverter(unittest.TestCase):
         expect = fo.read()
         fo.close()
 
-        fail_msg = "Test width1_chars failed, result is\n{0}, but expect:\n{1}".format(
+        expect = to_unicode(expect)
+        fail_msg = u"Test width1_chars failed, result is\n{0}, but expect:\n{1}".format(
             result, expect)
         self.assertEqual(result.rstrip(), expect.rstrip(), fail_msg)
 

@@ -747,6 +747,7 @@ def gen_table_from_csv(csv_content, csv_delimiter):
         current_row = []
         if row:
             for element in row:
+                element = to_unicode(element)
                 current_row.append(MyTableCell(element, "csv"))
         ret_table.append(current_row)
     return ret_table
@@ -759,6 +760,7 @@ def gen_table_from_list(csv_content):
     for row in csv_content:
         current_row = []
         for col in row:
+            col = to_unicode(col)
             current_row.append(MyTableCell(col, "csv"))
         ret_table.append(current_row)
     return ret_table
