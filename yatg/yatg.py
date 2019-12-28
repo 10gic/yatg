@@ -871,6 +871,7 @@ def main_entry(argv):
     column_align = None
     width1_chars = None
     align_in_tty = False
+    show_version = False
     try:
         import argparse  # argparse is introduced in Python 2.7 and Python 3.2
         arg_parser = argparse.ArgumentParser(
@@ -942,6 +943,11 @@ def main_entry(argv):
                  "please enlarge your tty window if you have long cell data.",
             action='store_true',
             dest="align_in_tty")
+        arg_parser.add_argument(
+            "--version",
+            help="show version and exit.",
+            action='store_true',
+            dest="show_version")
         args = arg_parser.parse_args(argv[1:])
         input_file = args.input_file
         input_format = args.input_format
@@ -952,10 +958,14 @@ def main_entry(argv):
         column_align = args.column_align
         width1_chars = args.width1_chars
         align_in_tty = args.align_in_tty
+        show_version = args.show_version
 
     except ImportError:
         sys.stderr.write("Warn: Cannot import argparse. Read from stdin, " \
                          "convert to {0} style always\n".format(output_style))
+    if show_version:
+        sys.stderr.write(__version__)
+        sys.exit(0)
     if column_align is not None:
         if column_align.replace("l", "").replace("r", ""):
             sys.stderr.write(
