@@ -80,7 +80,7 @@ Options::
 
   usage: yatg [-h] [-i INFILE] [-f FORMAT] [-d DELIMITER] [-o OUTFILE]
               [-s STYLE] [--no-header] [--column-align ALIGN]
-              [--width1-chars CHARS] [--align-in-tty]
+              [--width1-chars CHARS] [--align-in-tty] [--version]
 
   Yet Another Table Generator, convert CSV or html table to ASCII art table.
 
@@ -113,6 +113,7 @@ Options::
                           requires you in a tty, (2) each column width must less
                           than width of tty, please enlarge your tty window if
                           you have long cell data.
+    --version             show version and exit.
 
 As a library
 ------------
