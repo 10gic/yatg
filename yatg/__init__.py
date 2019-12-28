@@ -8,6 +8,8 @@ mysql, markdown.
 from .yatg import html_2_ascii_table, csv_2_ascii_table, FORCE_WIDTH1_CHARS, \
     main_entry, __author__, __version__, __email__, __source__, __license__
 
+import sys
+
 
 def run_main():
     main_entry(sys.argv)
