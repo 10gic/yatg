@@ -4,7 +4,7 @@
 
 __author__ = 'cig01'
 __email__ = 'juhani AT 163.com'
-__version__ = '0.11.4'
+__version__ = '0.11.5'
 __source__ = 'https://github.com/10gic/yatg'
 __license__ = 'AGPLv3+'
 
@@ -743,14 +743,32 @@ def gen_table_from_csv(csv_content, csv_delimiter):
     lines = csv_content.splitlines()
     data = csv.reader(lines, delimiter=csv_delimiter)
     ret_table = []
-    for row in data:
+    el_num_each_rows = [0] * len(lines)  # 0 repeated len(lines) times
+    for i, row in enumerate(data):
         current_row = []
         if row:
             for element in row:
                 element = to_unicode(element)
                 current_row.append(MyTableCell(element, "csv"))
+                el_num_each_rows[i] = el_num_each_rows[i] + 1
         ret_table.append(current_row)
-    return ret_table
+    el_min = min(el_num_each_rows)
+    el_max = max(el_num_each_rows)
+    if el_min == el_max:  # If each row has same number of elements
+        return ret_table
+    else:
+        # Adjust bad format csv. For example, change:
+        # 1, 2
+        # A, B, C
+        # To:
+        # 1, 2, 3
+        # A, B, C
+        for i, row in enumerate(ret_table):
+            # append `el_max - len(row)` empty element
+            if len(row) < el_max:
+                extra = [MyTableCell("", "csv")] * (el_max - len(row))
+                ret_table[i].extend(extra)
+        return ret_table
 
 
 def gen_table_from_list(csv_content):
